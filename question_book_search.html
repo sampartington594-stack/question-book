@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<title>question book</title>
+<style>
+  :root {
+    --bg: #090909;
+    --panel: #111111;
+    --panel-2: #161616;
+    --text: #f2f0eb;
+    --muted: #8e8b85;
+    --line: #292929;
+    --accent: #d8ff55;
+    --link: #a9c8ff;
+    --danger: #ff8d8d;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { color-scheme: dark; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  button, input {
+    font: inherit;
+  }
+
+  .home {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    width: min(1100px, 92vw);
+    margin: 0 auto;
+    padding: 22px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .brand {
+    color: var(--text);
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 9px rgba(216,255,85,.35);
+  }
+
+  .hero {
+    flex: 1;
+    width: min(920px, 92vw);
+    margin: 0 auto;
+    padding: 11vh 0 12vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .book-mark {
+    font-size: clamp(14px, 2vw, 18px);
+    color: var(--muted);
+    margin-bottom: 22px;
+  }
+
+  .hero h1 {
+    max-width: 780px;
+    margin: 0;
+    font-size: clamp(44px, 8vw, 94px);
+    line-height: .95;
+    letter-spacing: -0.055em;
+    font-weight: 400;
+  }
+
+  .hero h1 em {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .sub {
+    max-width: 650px;
+    margin: 24px 0 34px;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .search {
+    max-width: 820px;
+  }
+
+  .question-box {
+    border-bottom: 1px solid #5c5c5c;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .qmark {
+    color: var(--accent);
+    font-size: 28px;
+    flex: 0 0 auto;
+    line-height: 1;
+  }
+
+  #query {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    padding: 18px 0 17px;
+    font-size: clamp(21px, 3vw, 31px);
+  }
+
+  #query::placeholder {
+    color: #5e5c58;
+  }
+
+  #go {
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #080808;
+    padding: 9px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    white-space: nowrap;
+  }
+
+  .suggestions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .suggestion {
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    padding: 8px 11px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .suggestion:hover {
+    color: var(--text);
+    border-color: #4a4a4a;
+  }
+
+  .rules {
+    margin-top: 46px;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    max-width: 820px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .rule {
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--muted);
+  }
+
+  .rule b {
+    display: block;
+    color: var(--text);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .results-page {
+    width: min(1100px, 92vw);
+    margin: 0 auto;
+    padding: 25px 0 80px;
+    display: none;
+  }
+
+  .results-head {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+  }
+
+  .results-search {
+    flex: 1;
+  }
+
+  .mini-search {
+    width: 100%;
+    max-width: 720px;
+    border: 0;
+    border-bottom: 1px solid #555;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    padding: 10px 0;
+    font-size: 22px;
+  }
+
+  .back {
+    border: 1px solid var(--line);
+    color: var(--muted);
+    background: transparent;
+    border-radius: 6px;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  .mode-row {
+    display: flex;
+    gap: 7px;
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+
+  .mode {
+    border: 1px solid var(--line);
+    color: var(--muted);
+    background: transparent;
+    padding: 7px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+    text-transform: uppercase;
+  }
+
+  .mode.active {
+    color: #080808;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 38px;
+  }
+
+  .answer {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 22px;
+    border-radius: 10px;
+    margin-bottom: 26px;
+  }
+
+  .answer-label {
+    font: 10px ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  .answer h2 {
+    margin: 0 0 12px;
+    font-size: 30px;
+    font-weight: 400;
+  }
+
+  .answer p {
+    margin: 0;
+    color: #d8d5cf;
+    line-height: 1.65;
+    font-size: 16px;
+  }
+
+  .result {
+    border-top: 1px solid var(--line);
+    padding: 19px 0 21px;
+  }
+
+  .result:first-child {
+    border-top: 0;
+  }
+
+  .site {
+    color: #7c8977;
+    font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin-bottom: 5px;
+    word-break: break-all;
+  }
+
+  .result h3 {
+    margin: 0 0 7px;
+    font-size: 23px;
+    line-height: 1.18;
+    font-weight: 400;
+  }
+
+  .result h3 a {
+    color: var(--link);
+    text-decoration: none;
+  }
+
+  .result h3 a:hover {
+    text-decoration: underline;
+  }
+
+  .result p {
+    margin: 0;
+    color: #aaa7a1;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .sidebar {
+    border-left: 1px solid var(--line);
+    padding-left: 22px;
+  }
+
+  .side-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 15px;
+    border-radius: 9px;
+    margin-bottom: 12px;
+  }
+
+  .side-card h3 {
+    margin: 0 0 7px;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .side-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .source-link {
+    display: block;
+    margin-top: 9px;
+    color: var(--link);
+    text-decoration: none;
+    font-size: 13px;
+  }
+
+  .source-link:hover {
+    text-decoration: underline;
+  }
+
+  .state {
+    border: 1px dashed #393939;
+    padding: 27px;
+    color: var(--muted);
+    text-align: center;
+    border-radius: 9px;
+    line-height: 1.5;
+  }
+
+  .error {
+    color: var(--danger);
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid #333;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: -2px;
+    margin-right: 7px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  code {
+    color: #d7ff7c;
+  }
+
+  @media (max-width: 760px) {
+    .hero {
+      padding-top: 6vh;
+    }
+
+    .rules {
+      grid-template-columns: 1fr;
+    }
+
+    .results-head {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+      padding-left: 0;
+      padding-top: 22px;
+    }
+
+    #go {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="home" id="home">
+  <header class="topbar">
+    <div class="brand">question book</div>
+    <div class="status"><span class="dot"></span> internet connected</div>
+  </header>
+
+  <main class="hero">
+    <div class="book-mark">01 / ask anything</div>
+
+    <h1>
+      Ask a question.<br>
+      <em>Go find the answer.</em>
+    </h1>
+
+    <p class="sub">
+      A small search engine for the real web. No feed. No ads. No fake “results”.
+      Just a question, real sources, and links you can actually follow.
+    </p>
+
+    <div class="search">
+      <div class="question-box">
+        <div class="qmark">?</div>
+        <input id="query" type="text" autocomplete="off"
+               placeholder="what do you want to know?">
+        <button id="go">search</button>
+      </div>
+
+      <div class="suggestions">
+        <button class="suggestion">how do film cameras work?</button>
+        <button class="suggestion">who invented the synthesizer?</button>
+        <button class="suggestion">what is the old web?</button>
+      </div>
+    </div>
+
+    <div class="rules">
+      <div class="rule"><b>01 / WEB</b>real pages, not an invented local index</div>
+      <div class="rule"><b>02 / NO ADS</b>this interface adds no advertising or popups</div>
+      <div class="rule"><b>03 / YOU LEAVE</b>open a source and go explore the internet</div>
+    </div>
+  </main>
+</div>
+
+<div class="results-page" id="resultsPage">
+  <header class="results-head">
+    <div class="results-search">
+      <input id="miniQuery" class="mini-search" type="text" autocomplete="off">
+    </div>
+    <button class="back" id="backHome">home</button>
+  </header>
+
+  <div class="mode-row">
+    <button class="mode active" data-mode="web">web</button>
+    <button class="mode" data-mode="answer">answer</button>
+  </div>
+
+  <div class="grid">
+    <main>
+      <div id="output">
+        <div class="state"><span class="spinner"></span> searching the web…</div>
+      </div>
+    </main>
+
+    <aside class="sidebar">
+      <div class="side-card">
+        <h3>what this is</h3>
+        <p>
+          The front end is plain HTML/CSS/JS. Search results come from public internet
+          endpoints, so the page itself stays tiny and easy to edit.
+        </p>
+      </div>
+
+      <div class="side-card">
+        <h3>other ways out</h3>
+        <a class="source-link" id="wikiSearch" target="_blank" rel="noopener">Wikipedia</a>
+        <a class="source-link" id="googleSearch" target="_blank" rel="noopener">Google</a>
+        <a class="source-link" id="bingSearch" target="_blank" rel="noopener">Bing</a>
+        <a class="source-link" id="duckSearch" target="_blank" rel="noopener">DuckDuckGo</a>
+      </div>
+
+      <div class="side-card">
+        <h3>new tab friendly</h3>
+        <p>
+          Source links use normal browser links and open in a new tab. This page itself
+          does not create popups or redirect on refresh.
+        </p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+  let currentMode = "web";
+  let lastResults = [];
+  let lastQuery = "";
+
+  const home = document.getElementById("home");
+  const resultsPage = document.getElementById("resultsPage");
+  const query = document.getElementById("query");
+  const miniQuery = document.getElementById("miniQuery");
+  const output = document.getElementById("output");
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[char]));
+  }
+
+  function toSearchURL(base, q) {
+    return base + encodeURIComponent(q);
+  }
+
+  function setExternalSearchLinks(q) {
+    document.getElementById("wikiSearch").href = toSearchURL(
+      "https://en.wikipedia.org/w/index.php?search=", q
+    );
+    document.getElementById("googleSearch").href = toSearchURL(
+      "https://www.google.com/search?q=", q
+    );
+    document.getElementById("bingSearch").href = toSearchURL(
+      "https://www.bing.com/search?q=", q
+    );
+    document.getElementById("duckSearch").href = toSearchURL(
+      "https://duckduckgo.com/?q=", q
+    );
+  }
+
+  function showResultsPage(q) {
+    home.style.display = "none";
+    resultsPage.style.display = "block";
+    miniQuery.value = q;
+    setExternalSearchLinks(q);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  function showHome() {
+    resultsPage.style.display = "none";
+    home.style.display = "flex";
+    query.focus();
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+
+  function cleanURL(url) {
+    try {
+      return new URL(url).href;
+    } catch {
+      return null;
+    }
+  }
+
+  async function searchDuckDuckGo(q) {
+    const url =
+      "https://api.duckduckgo.com/?q=" +
+      encodeURIComponent(q) +
+      "&format=json&no_html=1&skip_disambig=0";
+
+    const response = await fetch(url, {
+      headers: { "Accept": "application/json" }
+    });
+
+    if (!response.ok) {
+      throw new Error("DuckDuckGo request failed");
+    }
+
+    const data = await response.json();
+    const found = [];
+
+    if (data.AbstractText && data.AbstractURL) {
+      found.push({
+        title: data.Heading || q,
+        url: cleanURL(data.AbstractURL),
+        snippet: data.AbstractText,
+        source: "DuckDuckGo"
+      });
+    }
+
+    function addTopics(items) {
+      for (const item of items || []) {
+        if (item.Topics) {
+          addTopics(item.Topics);
+        } else if (item.FirstURL && item.Text) {
+          found.push({
+            title: item.Text.split(" - ")[0] || item.Text,
+            url: cleanURL(item.FirstURL),
+            snippet: item.Text,
+            source: "DuckDuckGo"
+          });
+        }
+      }
+    }
+
+    addTopics(data.RelatedTopics);
+
+    return found
+      .filter(item => item.url)
+      .filter((item, index, arr) => arr.findIndex(x => x.url === item.url) === index)
+      .slice(0, 12);
+  }
+
+  async function searchWikipedia(q) {
+    const endpoint =
+      "https://en.wikipedia.org/w/api.php?action=query&list=search" +
+      "&srsearch=" + encodeURIComponent(q) +
+      "&format=json&origin=*&utf8=1&srlimit=10";
+
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("Wikipedia request failed");
+
+    const data = await response.json();
+
+    return (data.query?.search || []).map(item => ({
+      title: item.title,
+      url: "https://en.wikipedia.org/wiki/" + encodeURIComponent(item.title.replace(/ /g, "_")),
+      snippet: item.snippet
+        .replace(/<[^>]*>/g, "")
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&amp;/g, "&"),
+      source: "Wikipedia"
+    }));
+  }
+
+  function dedupeResults(items) {
+    const seen = new Set();
+    return items.filter(item => {
+      if (!item.url || seen.has(item.url)) return false;
+      seen.add(item.url);
+      return true;
+    });
+  }
+
+  function renderWeb(q, results) {
+    if (!results.length) {
+      output.innerHTML = `
+        <div class="state">
+          No direct results came back from the public search endpoints.
+          Try the external Google, Bing, or DuckDuckGo links on the right.
+        </div>
+      `;
+      return;
+    }
+
+    output.innerHTML = `
+      <div class="answer" style="display:none"></div>
+      ${results.map(item => `
+        <article class="result">
+          <div class="site">${escapeHTML(item.url)}</div>
+          <h3>
+            <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer">
+              ${escapeHTML(item.title)}
+            </a>
+          </h3>
+          <p>${escapeHTML(item.snippet || "Open this page to explore the source.")}</p>
+        </article>
+      `).join("")}
+    `;
+  }
+
+  function renderAnswer(q, results) {
+    if (!results.length) {
+      output.innerHTML = `
+        <div class="state">
+          I couldn't find enough public results to make an answer.
+        </div>
+      `;
+      return;
+    }
+
+    const top = results[0];
+    const sourceLines = results.slice(0, 5).map(item => `
+      <a class="source-link" target="_blank" rel="noopener noreferrer"
+         href="${escapeHTML(item.url)}">${escapeHTML(item.title)}</a>
+    `).join("");
+
+    output.innerHTML = `
+      <section class="answer">
+        <div class="answer-label">answer / based on live web results</div>
+        <h2>${escapeHTML(q)}</h2>
+        <p>
+          The strongest public source I found is <strong>${escapeHTML(top.title)}</strong>.
+          It says: ${escapeHTML(top.snippet || "Open the source to read the full material.")}
+        </p>
+      </section>
+
+      <div style="font:11px ui-monospace, SFMono-Regular, Menlo, monospace;
+                  text-transform:uppercase;letter-spacing:.08em;color:#8e8b85;margin-bottom:9px">
+        sources
+      </div>
+
+      ${sourceLines}
+    `;
+  }
+
+  async function runSearch(q) {
+    q = q.trim();
+    if (!q) return;
+
+    lastQuery = q;
+    showResultsPage(q);
+
+    output.innerHTML = `
+      <div class="state">
+        <span class="spinner"></span> searching real web sources…
+      </div>
+    `;
+
+    try {
+      const [duck, wiki] = await Promise.allSettled([
+        searchDuckDuckGo(q),
+        searchWikipedia(q)
+      ]);
+
+      const combined = dedupeResults([
+        ...(duck.status === "fulfilled" ? duck.value : []),
+        ...(wiki.status === "fulfilled" ? wiki.value : [])
+      ]).slice(0, 20);
+
+      lastResults = combined;
+
+      if (currentMode === "answer") {
+        renderAnswer(q, combined);
+      } else {
+        renderWeb(q, combined);
+      }
+
+      // The query is shown in the URL so refresh/back don't create a popup,
+      // and so the search can be shared as a normal URL.
+      history.replaceState(
+        { q },
+        "",
+        "?q=" + encodeURIComponent(q)
+      );
+
+      document.title = q + " — question book";
+    } catch (error) {
+      output.innerHTML = `
+        <div class="state error">
+          The live search request failed in this browser.
+          The external search links are still available on the right.
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById("go").addEventListener("click", () => runSearch(query.value));
+
+  query.addEventListener("keydown", event => {
+    if (event.key === "Enter") runSearch(query.value);
+  });
+
+  miniQuery.addEventListener("keydown", event => {
+    if (event.key === "Enter") runSearch(miniQuery.value);
+  });
+
+  document.getElementById("backHome").addEventListener("click", showHome);
+
+  document.querySelectorAll(".suggestion").forEach(button => {
+    button.addEventListener("click", () => {
+      query.value = button.textContent.trim();
+      runSearch(query.value);
+    });
+  });
+
+  document.querySelectorAll(".mode").forEach(button => {
+    button.addEventListener("click", () => {
+      currentMode = button.dataset.mode;
+      document.querySelectorAll(".mode").forEach(x =>
+        x.classList.toggle("active", x === button)
+      );
+
+      if (lastQuery) {
+        if (currentMode === "answer") {
+          renderAnswer(lastQuery, lastResults);
+        } else {
+          renderWeb(lastQuery, lastResults);
+        }
+      }
+    });
+  });
+
+  // Restore a query from a normal URL, without opening anything automatically.
+  const params = new URLSearchParams(location.search);
+  const savedQuery = params.get("q");
+
+  if (savedQuery) {
+    query.value = savedQuery;
+    runSearch(savedQuery);
+  } else {
+    query.focus();
+  }
+</script>
+
+</body>
+</html>
